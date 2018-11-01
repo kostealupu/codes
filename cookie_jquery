@@ -1,0 +1,38 @@
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="//yandex.st/jquery/cookie/1.0/jquery.cookie.min.js"></script> 
+ 
+ <script>
+(function($) {
+$(function() {
+
+  // Проверим, есть ли запись в куках о посещении посетителя
+  // Если запись есть - ничего не делаем
+  if (!$.cookie('was')) {
+
+    // Покажем всплывающее окно
+    
+	
+	  /*----Модальные окна не уходи---------------------*/
+            $(document).mouseleave(function(e){
+                if (e.clientY < 10) {
+                    $("#exitblock").modal('show');
+					$(document).off("mouseleave");
+                }    
+            });
+        
+            /*---- / Модальные окна не уходи---------------------*/
+
+  }
+  
+
+  // Запомним в куках, что посетитель к нам уже заходил
+  $.cookie('was', true, {
+    expires: 1,
+    path: '/'
+  });
+
+})
+})(jQuery)
+</script>
+
+<div id="exitblock">modal with cookie 1 day</div>
