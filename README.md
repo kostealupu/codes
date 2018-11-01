@@ -1,1 +1,4 @@
-popup on browser window/tab close, with yandex cookies
+mini codes for my project
+php
+jquery
+javascript
