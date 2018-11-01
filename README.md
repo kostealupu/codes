@@ -1,4 +1,4 @@
-mini codes for my project
+mini codes for my projects
 php
 jquery
 javascript
