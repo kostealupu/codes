@@ -1,0 +1,105 @@
+<?php
+
+$sendto   = "";
+$usermail = "";
+$sendname = $_POST['names'];
+$sendphone = $_POST['phones'];
+$sendpric  = $_POST['pric'];
+$content = 'Товар:'. $_POST['prod'] . '  /  Цена:'. $_POST['pric'] . '  /  Cсылка:' . $_POST['silka'];
+// Формирование заголовка письма
+$subject  = "Дешевле";
+$headers  = "From: " . strip_tags($usermail) . "\r\n";
+$headers .= "Reply-To: ". strip_tags($usermail) . "\r\n";
+$headers .= "MIME-Version: 1.0\r\n";
+$headers .= "Content-Type: text/html;charset=utf-8 \r\n";
+// Формирование тела письма
+$msg  = "";
+$msg .= "имя: ".$sendname."\r\n";
+$msg .= "телефон: ".$sendphone."\r\n";
+
+$msg .= "".$content."\r\n";
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+
+			//bitrix24 - Начнем интеграцию
+			// CRM server conection data
+			define('CRM_HOST', '4fe.bitrix24.ru'); 
+			define('CRM_PORT', '443'); // CRM server port
+			define('CRM_PATH', '/crm/configs/import/lead.php'); // CRM server REST service path
+
+			// CRM данные
+			define('CRM_LOGIN', 'botinok@klemma.su'); 
+			define('CRM_PASSWORD', 'qwerty12345'); //
+			/********************************************************************************************/
+
+			// POST processing
+		
+			 $simv = array("(", ")", " ","-","+");
+			 $sendphone=str_replace($simv, "", $sendphone);			
+			
+$postData = array(
+      'TITLE' => 'Дешевле tomsk', // Установить значение
+
+	  'NAME' => $sendname,
+	  'PHONE_MOBILE' => $sendphone,
+	  'COMMENTS' => $content
+	  
+   );
+ 
+   if (defined('CRM_AUTH'))
+   {
+      $postData['AUTH'] = CRM_AUTH;
+   }
+   else
+   {
+      $postData['LOGIN'] = CRM_LOGIN;
+      $postData['PASSWORD'] = CRM_PASSWORD;
+   }
+ 
+   $fp = fsockopen("ssl://".CRM_HOST, CRM_PORT, $errno, $errstr, 30);
+   if ($fp)
+   {
+      $strPostData = '';
+      foreach ($postData as $key => $value)
+         $strPostData .= ($strPostData == '' ? '' : '&').$key.'='.urlencode($value);
+ 
+      $str = "POST ".CRM_PATH." HTTP/1.0\r\n";
+      $str .= "Host: ".CRM_HOST."\r\n";
+      $str .= "Content-Type: application/x-www-form-urlencoded\r\n";
+      $str .= "Content-Length: ".strlen($strPostData)."\r\n";
+      $str .= "Connection: close\r\n\r\n";
+ 
+      $str .= $strPostData;
+ 
+      fwrite($fp, $str);
+ 
+      $result = '';
+      while (!feof($fp))
+      {
+         $result .= fgets($fp, 128);
+      }
+      fclose($fp);
+ 
+      $response = explode("\r\n\r\n", $result);
+ 
+      $output = '<pre>'.print_r($response[1], 1).'</pre>';
+   }
+   else
+   {
+      echo 'Connection Failed! '.$errstr.' ('.$errno.')';
+   }
+
+
+
+			 //end CRM
+			 //bitrix24  - все, теперь у нас должен все работать
+	
+mail($sendto, $subject, $msg, 'from:'.$usermail, '-f'.$usermail);
+echo "true";
+}
+else
+{
+	echo "false";
+}
+?>
