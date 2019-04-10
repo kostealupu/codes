@@ -1,0 +1,10 @@
+<div class="header-lng">
+
+<?php $url = 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI']; 
+$prefixen=".com";
+
+
+?>
+<a class="active">RU</a> / <a href="<?php print str_replace($prefixen, ".com/en", $url); ?>">EN</a>
+/ <a href="<?php print str_replace($prefixen, ".com/ar", $url); ?>" >AR</a>
+					</div>
