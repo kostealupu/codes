@@ -568,6 +568,7 @@ $data['totals'] = $order_info['totals'];
 					$data['products'][] = array(
 						'name'     => $product['name'],
 						'model'    => $product['model'],
+						'href' => $this->url->link('product/product', 'product_id=' . $product['product_id']),
 						'option'   => $option_data,
 						'quantity' => $product['quantity'],
 						'price'    => $this->currency->format($product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
@@ -860,7 +861,7 @@ $data['totals'] = $order_info['totals'];
 				$mail->send();
 			}
 			
-			
+
 			//////////////////////////////////////////////////////////////////////////////////// bitrix24
 			
 			            $bitrix24login = $this->config->get('config_bitrix24_login');
@@ -871,7 +872,7 @@ $data['totals'] = $order_info['totals'];
                 foreach ($data['products'] as $product) {
                 $bitrix24option = empty($product['option']) ? "" : "<br/><br/><b>Опции:</b>";
                 $bitrix24products .= 
-                "<b>Название:</b> ".$product['name']."".
+                "<b>Название:</b> ".$product['name']."(<a target='_blank' href='".$product['href']."'>Ссылка</a>)".
                 "<br/><b>Количество:</b> ".$product['quantity']." шт.".
                 "<br/><b>Цена:</b> ".$product['price']."".
                 "<br/><b>Сумма:</b> ".$product['total']."".
@@ -942,7 +943,7 @@ $data['totals'] = $order_info['totals'];
                 $bitrix24GetData = array(
                     'LOGIN' => $bitrix24login,
                     'PASSWORD' => $bitrix24password,
-                    'TITLE' => "Заказ №".$order_id,
+                    'TITLE' => "Заказ №".$order_id." - ".$data['payment_method'],
                     'NAME' => $data['firstname'],
                     'LAST_NAME' => $data['lastname'],
                     'PHONE_OTHER' => $data['telephone'],
