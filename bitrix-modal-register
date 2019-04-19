@@ -1,0 +1,53 @@
+//fancybox 3 
+
+<a data-fancybox data-options='{"smallBtn" : true, "src" : "http://site.ru/auth/register.php", "type" : "ajax"}' href="javascript:;">
+	Регистрация</a>
+  
+  
+  //register.php component register ajax!!!
+  
+  
+  <?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");?>
+<script type="text/javascript" src="/bitrix/js/main/ajax.js"></script>
+<?$APPLICATION->IncludeComponent(
+	"bitrix:main.register", 
+	"register", 
+	array(
+		"AUTH" => "Y",
+		"COMPONENT_TEMPLATE" => "register",
+		"REQUIRED_FIELDS" => array(
+			0 => "EMAIL",
+			1 => "NAME",
+			2 => "SECOND_NAME",
+			3 => "LAST_NAME",
+			4 => "PERSONAL_PHONE",
+			5 => "WORK_COMPANY",
+		),
+		"SET_TITLE" => "Y",
+		"SHOW_FIELDS" => array(
+			0 => "EMAIL",
+			1 => "NAME",
+			2 => "SECOND_NAME",
+			3 => "LAST_NAME",
+			4 => "PERSONAL_PHONE",
+			5 => "WORK_COMPANY",
+		),
+		
+		"USER_PROPERTY" => array(
+			0 => "UF_INN",
+			1 => "UF_KPP",
+			2 => "UF_URADRES",
+			3 => "UF_CONFIDENCIAL",
+		),
+		"USER_PROPERTY_NAME" => "",
+		"USE_BACKURL" => "N",
+  "AJAX_MODE" => "Y",
+        "AJAX_OPTION_SHADOW" => "N",
+        "AJAX_OPTION_JUMP" => "N",
+        "AJAX_OPTION_STYLE" => "Y",
+        "AJAX_OPTION_HISTORY" => "N",
+	),
+	false
+);?>
+
+<?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
