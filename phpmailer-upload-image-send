@@ -1,0 +1,84 @@
+<?php
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require 'Exception.php';
+require 'PHPMailer.php';
+require 'SMTP.php';
+
+
+//Create a new PHPMailer instance
+$mail = new PHPMailer;
+//Set who the message is to be sent from
+$mail->setFrom('mail@v195893.vps.mcdir.ru', 'mail@v195893.vps.mcdir.ru');
+
+//Set who the message is to be sent to
+$mail->addAddress('kostealupu@gmail.com', 'kostealupu@gmail.com');
+//Set the subject line
+$mail->Subject = 'spravka-003.ru';
+//Read an HTML message body from an external file, convert referenced images to embedded,
+//convert HTML into a basic plain-text alternative body
+$mail->msgHTML(file_get_contents('contents.html'), __DIR__);
+//Replace the plain text body with one created manually
+$mail->AltBody = 'This is a plain-text message body';
+
+$user_fullname          = $_POST['user_fullname'];
+$user_dob       = $_POST['user_dob'];
+$user_address       = $_POST['user_address'];
+$user_phone         = $_POST['user_phone'];
+
+  $mail->Body = <<<EOD
+Заказ медицинской справки 003 для ГАИ и ГИБДД
+<br />
+<br />
+*****************************
+<br />
+<br />
+<strong>Ф.И.О. :</strong> $user_fullname<br />
+<strong>Дата рождения :</strong> $user_dob<br />
+<strong>Адрес прописки :</strong> $user_address<br />
+<strong>Телефон :</strong> $user_phone<br />
+EOD;
+
+$uploaddir="uploads/";
+
+$uploadfilescan=$uploaddir.basename($_FILES['user_scanpassport']['name']);
+$uploadfilephoto=$uploaddir.basename($_FILES['user_photo']['name']);
+
+echo $uploadfilescan;
+echo $uploadfilephoto;
+
+if (move_uploaded_file($_FILES['user_scanpassport']['tmp_name'], $uploadfilescan)) {
+}
+else
+{
+    //echo "file not uploaded";
+}
+if (move_uploaded_file($_FILES['user_photo']['tmp_name'], $uploadfilephoto)) {
+}
+else
+{
+    //echo "file not uploaded";
+}
+$file_to_attachscan="/".$uploaddir.$_FILES['user_scanpassport']['name'];
+$file_to_attachphoto="/".$uploaddir.$_FILES['user_photo']['name'];
+
+$filescan=$_FILES['user_scanpassport']['name'];
+$filephoto=$_FILES['user_photo']['name'];
+
+$file_to_attachscan="".$uploaddir.$_FILES['user_scanpassport']['name'];
+$file_to_attachphoto="".$uploaddir.$_FILES['user_photo']['name'];
+
+
+
+$mail->addAttachment($file_to_attachscan);
+$mail->addAttachment($file_to_attachphoto);
+
+if (!$mail->send()) {
+    echo "Mailer Error: " . $mail->ErrorInfo;
+} else {
+    echo "Message sent!";
+}
+
+?>
