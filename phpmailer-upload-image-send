@@ -11,17 +11,15 @@ require 'SMTP.php';
 //Create a new PHPMailer instance
 $mail = new PHPMailer;
 //Set who the message is to be sent from
-$mail->setFrom('mail@v195893.vps.mcdir.ru', 'mail@v195893.vps.mcdir.ru');
+$mail->setFrom('mail@v195893.vps.mcdir.ru', 'imia familia');
 
 //Set who the message is to be sent to
-$mail->addAddress('kostealupu@gmail.com', 'kostealupu@gmail.com');
+$mail->addAddress('kostealupu@mail.com', 'imia familia');
 //Set the subject line
-$mail->Subject = 'spravka-003.ru';
-//Read an HTML message body from an external file, convert referenced images to embedded,
-//convert HTML into a basic plain-text alternative body
-$mail->msgHTML(file_get_contents('contents.html'), __DIR__);
-//Replace the plain text body with one created manually
-$mail->AltBody = 'This is a plain-text message body';
+$mail->Subject = 'test test;
+
+
+
 
 $user_fullname          = $_POST['user_fullname'];
 $user_dob       = $_POST['user_dob'];
@@ -43,11 +41,16 @@ EOD;
 
 $uploaddir="uploads/";
 
+
+
 $uploadfilescan=$uploaddir.basename($_FILES['user_scanpassport']['name']);
 $uploadfilephoto=$uploaddir.basename($_FILES['user_photo']['name']);
 
+
 echo $uploadfilescan;
 echo $uploadfilephoto;
+
+
 
 if (move_uploaded_file($_FILES['user_scanpassport']['tmp_name'], $uploadfilescan)) {
 }
@@ -55,12 +58,17 @@ else
 {
     //echo "file not uploaded";
 }
+
+
+
 if (move_uploaded_file($_FILES['user_photo']['tmp_name'], $uploadfilephoto)) {
 }
 else
 {
     //echo "file not uploaded";
 }
+
+
 $file_to_attachscan="/".$uploaddir.$_FILES['user_scanpassport']['name'];
 $file_to_attachphoto="/".$uploaddir.$_FILES['user_photo']['name'];
 
@@ -72,8 +80,28 @@ $file_to_attachphoto="".$uploaddir.$_FILES['user_photo']['name'];
 
 
 
+$extension = pathinfo($_FILES["user_scanpassport"]["name"], PATHINFO_EXTENSION);
+if($extension=='jpg' || $extension=='jpeg' || $extension=='png' || $extension=='gif')
+	{
 $mail->addAttachment($file_to_attachscan);
+}else
+{
+echo "File is not image";
+}
+
+
+
+$extensionp = pathinfo($_FILES["user_photo"]["name"], PATHINFO_EXTENSION);
+if($extensionp=='jpg' || $extensionp=='jpeg' || $extensionp=='png' || $extensionp=='gif')
+	{
 $mail->addAttachment($file_to_attachphoto);
+
+}else
+{
+echo "File is not image";
+}
+
+
 
 if (!$mail->send()) {
     echo "Mailer Error: " . $mail->ErrorInfo;
@@ -82,3 +110,72 @@ if (!$mail->send()) {
 }
 
 ?>
+
+
+
+
+<form id="question" action="send/send.php" method="post" enctype="multipart/form-data">
+
+    <div class="col-lg-2 col-md-2 orange-form-header-wrap">
+          <div class="orange-form-header">
+            <span>ОФОРМИТЬ СПРАВКУ</span>
+          </div>
+    </div>
+    <div class="col-lg-8 col-md-8 col-sm-12">
+        <div class="col-lg-4 col-md-4 col-sm-4 form-part">
+            <div class="form-1">
+                <input type="text" name="user_fullname" placeholder="Ф.И.О." />
+                <input type="text" name="user_dob" placeholder="Дата рождения" />
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 form-part">
+            <div class="form-1">
+              <input type="text" name="user_address" placeholder="Адрес прописки" />
+              <input type="text" name="user_phone" placeholder="Телефон" class="required"/ required>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 form-part">
+            <div class="form-1">
+              <label class="input_file">Паспорт - главная страница<input type="file" name="user_scanpassport" accept="image/jpeg,image/png,image/gif"></label>
+              <label class="input_file">Паспорт - прописка<input type="file" name="user_photo" accept="image/jpeg,image/png,image/gif"></label>
+            </div>
+        </div>                
+    </div>  
+    <div class="col-lg-2 col-md-2 cta-button-wrap">
+      <div class="cta-btn-wrapper hvr-rectangle-out">
+        <input id="check" name="check" type="hidden" value="" />
+          <input type="submit" value="ОТПРАВИТЬ ЗАКАЗ" />
+      </div>
+    </div>
+
+</form>   
+
+
+<script>
+$(document).ready(function() {
+	
+	
+	$("#question").submit(function() {
+		 event.preventDefault();
+		 
+  var formData = new FormData($(this)[0]);
+
+  $.ajax({
+    url: "/send/send.phpxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    type: "POST",
+    data: formData,
+    success: function(response){  
+                    $.colorbox({href: "#submitted", inline: true, open: true, closeButton: true});
+                    window.setTimeout(function() {
+                        $.colorbox.close();
+                    }, 5000);
+            },
+    cache: false,
+    contentType: false,
+    processData: false
+  });
+
+  e.preventDefault();
+});
+});
+</script>
