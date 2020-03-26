@@ -1,0 +1,29 @@
+ //add email in order list + number of orders from billing_email
+ 
+ add_action( 'manage_shop_order_posts_custom_column' , 'custom_orders_list_column_content', 50, 2 );
+function custom_orders_list_column_content( $column, $post_id ) {
+    if ( $column == 'order_number' )
+    {
+        global $the_order;
+
+        if( $email = $the_order->get_billing_email() ){
+            echo '<br><strong><a href="mailto:'.$email.'">' . $email . '</a></strong>';
+        }
+
+//Checking if this email has already bought something in WooCommerce
+    if( $email = $the_order->get_billing_email() ){
+    $customer_orders = get_posts( array(
+        'numberposts' => -1,
+        'meta_key'    => '_billing_email',
+        'meta_value'  => $email,
+        'post_type'   => 'shop_order', // WC orders post type
+        'post_status' => 'any' // Only orders with status "completed"
+    ) );
+
+    // return number of orders from this billing_email
+  echo count($customer_orders); 
+
+  }
+
+    }
+}
