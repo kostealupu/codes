@@ -1,0 +1,6 @@
+<?
+$var = $arItem['PROPERTIES']['AUTHORS']['VALUE'];  //записать значение нужного поля в переменную var
+$res = CIBlockElement::GetByID($var);
+if($ar_res = $res->GetNext())
+?>
+ <img class="author-profile-image" src="<?=CFile::GetPath($ar_res["PREVIEW_PICTURE"])?>" alt="<?=$ar_res['NAME'];?>">
