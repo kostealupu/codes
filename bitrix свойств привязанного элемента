@@ -1,6 +1,25 @@
 <?
-$var = $arItem['PROPERTIES']['AUTHORS']['VALUE'];  //записать значение нужного поля в переменную var
+$var = $arItem['PROPERTIES']['AUTHORS']['VALUE'];  //or $arResult['PROPERTIES']['AUTHORS']['VALUE']
 $res = CIBlockElement::GetByID($var);
 if($ar_res = $res->GetNext())
 ?>
  <img class="author-profile-image" src="<?=CFile::GetPath($ar_res["PREVIEW_PICTURE"])?>" alt="<?=$ar_res['NAME'];?>">
+
+//other method
+<?
+$arOrder = Array();      // сортируем по свойству ID_MSSQL по возрастанию
+$arFilter = Array("IBLOCK_ID"=>11, "ID"=>$var );   // указываем из какого Инфоблока брать данные $var- id elemnta dlia vivod
+
+$arSelectFields = Array("ID","IBLOCK_ID", "NAME", "DETAIL_PAGE_URL", "PREVIEW_PICTURE", "PROPERTY_LINK",  "PROPERTY_ICON" );
+$res = CIBlockElement::GetList($arOrder, $arFilter, false, false, $arSelectFields);
+
+while($ar_fields = $res->GetNext())
+{
+$ar_fieldsCWName = $ar_fields["NAME"];       
+   echo $ar_fieldsCWName;     
+ $ar_fieldsCWNames = $ar_fields["PREVIEW_PICTURE"];       
+   echo $ar_fieldsCWNames;     
+     
+}  
+
+?>
