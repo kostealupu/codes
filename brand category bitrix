@@ -1,0 +1,92 @@
+1. В result_modifier.php в конце добавь
+if($arResult['ITEMS']) {
+  $currentElement = current($arResult['ITEMS']);
+  
+  $bPropertyBrandDisplay = isset($currentElement['DISPLAY_PROPERTIES']['BRAND']) ? true : false;
+  $bPropertyBrandLink = $bPropertyBrandDisplay && $currentElement['DISPLAY_PROPERTIES']['BRAND']['LINK_IBLOCK_ID'] ? true : false;
+  
+  $brandsIblockId = $bPropertyBrandLink ? $currentElement['DISPLAY_PROPERTIES']['BRAND']['LINK_IBLOCK_ID'] : 0;
+
+  $brandsId = $brands = [];
+
+  if($bPropertyBrandDisplay && $bPropertyBrandLink) {
+    foreach($arResult['ITEMS'] as $arItem) {
+      $brandId = (int)$arItem['DISPLAY_PROPERTIES']['BRAND']['VALUE'];
+      if($brandId) {
+        $brandsId[] = $brandId;
+      }
+    }
+
+    if($brandsId) {
+      $brandsId = array_unique($brandsId);
+      $bShowBrandPicture = isset($arParams['SHOW_BRAND_PICTURE']) && $arParams['SHOW_BRAND_PICTURE'] == 'Y' ? true : false;
+
+      $order = ['ID' => 'ASC'];
+      $filter = ['IBLOCK_ID' => $brandsIblockId, 'ID' => $brandsId]; // Если надо добавляешь в фильтр активность элементов 'ACTIVE' => 'Y', 'GLOBAL_ACTIVE' => 'Y', 'ACTIVE_DATE' => 'Y'
+      $select = ['IBLOCK_ID', 'ID', 'NAME', 'DETAIL_PAGE_URL'];
+      if($bShowBrandPicture) {
+        $select = array_merge($select, ['PREVIEW_PICTURE', 'DETAIL_PICTURE']);
+      }
+      
+      $result = CIBlockElement::GetList($order, $filter, false, false, $select);
+      while($row = $result->GetNext()) {
+        $row['PICTURE'] = [];
+        
+        if($bShowBrandPicture) {
+          $pictureResize = ['width' => 120, 'height' => 40];
+          $pictureId = $row['PREVIEW_PICTURE'] ? $row['PREVIEW_PICTURE'] : $row['DETAIL_PICTURE'];
+          
+          if($pictureId) {
+            $row['PICTURE'] = CFile::ResizeImageGet($pictureId, $pictureResize, BX_RESIZE_IMAGE_PROPORTIONAL_ALT, true);
+            $row['PICTURE']['ALT'] = $row['NAME'];
+            $row['PICTURE']['TITLE'] = $row['NAME'];
+            
+            if($row['DETAIL_PICTURE']) {
+              $iProperty = new \Bitrix\Iblock\InheritedProperty\ElementValues($row['IBLOCK_ID'], $row['ID']);
+              $iPropertyValues = $iProperty->getValues();
+              
+              if($iPropertyValues['ELEMENT_DETAIL_PICTURE_FILE_TITLE'])
+                 $row['PICTURE']['TITLE'] = $iPropertyValues['ELEMENT_DETAIL_PICTURE_FILE_TITLE'];
+               
+              if($iPropertyValues['ELEMENT_DETAIL_PICTURE_FILE_ALT'])
+                 $row['PICTURE']['ALT'] = $iPropertyValues['ELEMENT_DETAIL_PICTURE_FILE_ALT'];
+            }
+          }
+        }
+        
+        $brands[$row['ID']] = $row;
+      }
+    }
+  }
+  
+  if($brands) {
+    foreach($arResult['ITEMS'] as &$arItem) {
+      $brandId = (int)$arItem['DISPLAY_PROPERTIES']['BRAND']['VALUE'];
+      if($brandId) {
+        $arItem['BRAND_ITEM'] = $brands[$brandId];
+      }
+    }
+    
+    unset($arItem, $brands, $brandsId, $currentElement);
+  }
+}
+
+
+2. В template.php, внутри цикла по элементам
+<?if($arItem['BRAND_ITEM']):?>
+  <div class="brand">
+    <meta itemprop="brand" content="<?=$arItem['BRAND_ITEM']['NAME']?>" />
+    <?if($arItem['BRAND_ITEM']['PICTURE']):?>
+      <a class="brand_picture" href="<?=$arItem['BRAND_ITEM']['DETAIL_PAGE_URL']?>">
+        <img src="<?=$arItem['BRAND_ITEM']['PICTURE']['src'];?>" alt="<?=$arItem['BRAND_ITEM']['PICTURE']['ALT']?>" title="<?=$arItem['BRAND_ITEM']['PICTURE']['TITLE'];?>" />
+      </a>
+    <?else:?>
+      <b class="block_title"><?=GetMessage('BRAND');?>:</b>
+      <a href="<?=$arItem['BRAND_ITEM']['DETAIL_PAGE_URL']?>"><?=$arItem['BRAND_ITEM']['NAME']?></a>
+    <?endif;?>
+  </div>
+<?endif;?>
+
+
+3. В шаблоне компонента catalog в файле section.php где вызывается catalog.section добавь
+"SHOW_BRAND_PICTURE" => $arParams["SHOW_BRAND_PICTURE"],
