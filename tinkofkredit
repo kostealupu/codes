@@ -1,0 +1,47 @@
+<script>
+var sume='<?=$arResult['CURRENT_ITEM']['MIN_PRICE']['DISCOUNT_VALUE_VAT'];?>';
+var phone;
+var email;
+var names;
+$("#CALC input[name=PHONE]").on('keyup', function () {
+phone = $(this).val();
+});
+$("#CALC input[name=EMAIL]").on('keyup', function () {
+email = $(this).val();
+});
+
+$("#CALC input[name=NAME]").on('keyup', function () {
+names = $(this).val();
+});
+
+</script>
+
+<button
+style=" display: none; "
+id="tink"
+  type="button"
+  class="TINKOFF_BTN_YELLOW TINKOFF_SIZE_L"
+  onclick="
+tinkoff.create(
+    {
+      sum: sume,
+      items: [{name: '<?=$arResult['CURRENT_ITEM']['NAME']?>', price: sume, quantity: 1}],
+      demoFlow: 'sms',
+      promoCode: 'default',
+      shopId: '0418db49-f191-46da-926e-c84851986950',
+      showcaseId: '9e965e06-09c2-41fc-b38b-199247061892',
+ values: {
+        contact: {
+fio: {
+firstName: names,
+lastName: ' ',
+middleName: ' '
+          },
+          mobilePhone: phone,
+          email: email
+        }
+      }
+    },
+    {view: 'modal'}
+  )"
+></button>
